@@ -1,0 +1,41 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "nginx-3"
+  namespace: "default"
+  labels:
+    app: "nginx-3"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "nginx-3"
+  template:
+    metadata:
+      labels:
+        app: "nginx-3"
+    spec:
+      containers:
+      - name: "moviedb-sha256-1"
+        image: "gcr.io/cap1-339903/github.com/manjulanerati/moviedb@sha256:9bf0fd1819d8ab3465147ea535733aefd44eda4d0bbe3f3fb5bb7bfe43bc072a"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "nginx-3-hpa-aeme"
+  namespace: "default"
+  labels:
+    app: "nginx-3"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "nginx-3"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80
